@@ -12,6 +12,7 @@
 #     for all 7 oxygenation predictors + full 7x7 correlation matrix
 #   - 95% percentile intervals for k-fold AUROC and mean optimism
 #   - DeLong 95% CI for LOCO AUROC
+#   - 95% percentile intervals added for summary model k-fold AUROC and optimism
 #
 # Author: Joseph L. Hagan, ScD, MSPH
 # Date:   April 2026
@@ -321,8 +322,12 @@ summary_cv <- function(dat, outcome_var, use_slopes = FALSE, k = 10,
   loco_auc <- as.numeric(pROC::auc(loco_roc))
   loco_ci  <- as.numeric(pROC::ci.auc(loco_roc, method = "delong"))
 
+  kfold_pi <- quantile(kfold_aucs, c(0.025, 0.975), na.rm = TRUE)
+
   list(kfold_mean = mean(kfold_aucs, na.rm = TRUE),
        kfold_sd   = sd(kfold_aucs, na.rm = TRUE),
+       kfold_pi   = kfold_pi,   # 95% percentile interval for k-fold AUROC
+       kfold_aucs = kfold_aucs, # full replicate vector (for optimism PI)
        loco       = loco_auc,
        loco_ci    = loco_ci,
        n_features = ncol(X_subj))
@@ -393,18 +398,24 @@ run_analysis <- function(dat, outcome_var, outcome_label, pred_vars, n_reps) {
 
   cat("\n--- Summary Model Results ---\n")
   cat(sprintf("Means only (%d features):\n", summ_means$n_features))
-  cat(sprintf("  10-fold: mean = %.3f, SD = %.3f, optimism = %+.3f\n",
-              summ_means$kfold_mean, summ_means$kfold_sd,
-              summ_means$kfold_mean - loco_auc))
-  cat(sprintf("  LOCO:    %.3f (DeLong 95%% CI: %.3f–%.3f), optimism = %+.3f\n",
+  cat(sprintf("  10-fold: mean = %.3f [%.3f, %.3f], SD = %.3f, optimism = %+.3f [%+.3f, %+.3f]\n",
+              summ_means$kfold_mean, summ_means$kfold_pi[1], summ_means$kfold_pi[2],
+              summ_means$kfold_sd,
+              summ_means$kfold_mean - loco_auc,
+              summ_means$kfold_pi[1] - loco_auc,
+              summ_means$kfold_pi[2] - loco_auc))
+  cat(sprintf("  LOCO:    %.3f (DeLong 95%% CI: %.3f\u2013%.3f), optimism = %+.3f\n",
               summ_means$loco, summ_means$loco_ci[1], summ_means$loco_ci[3],
               summ_means$loco - loco_auc))
 
   cat(sprintf("Means + slopes (%d features):\n", summ_slopes$n_features))
-  cat(sprintf("  10-fold: mean = %.3f, SD = %.3f, optimism = %+.3f\n",
-              summ_slopes$kfold_mean, summ_slopes$kfold_sd,
-              summ_slopes$kfold_mean - loco_auc))
-  cat(sprintf("  LOCO:    %.3f (DeLong 95%% CI: %.3f–%.3f), optimism = %+.3f\n",
+  cat(sprintf("  10-fold: mean = %.3f [%.3f, %.3f], SD = %.3f, optimism = %+.3f [%+.3f, %+.3f]\n",
+              summ_slopes$kfold_mean, summ_slopes$kfold_pi[1], summ_slopes$kfold_pi[2],
+              summ_slopes$kfold_sd,
+              summ_slopes$kfold_mean - loco_auc,
+              summ_slopes$kfold_pi[1] - loco_auc,
+              summ_slopes$kfold_pi[2] - loco_auc))
+  cat(sprintf("  LOCO:    %.3f (DeLong 95%% CI: %.3f\u2013%.3f), optimism = %+.3f\n",
               summ_slopes$loco, summ_slopes$loco_ci[1], summ_slopes$loco_ci[3],
               summ_slopes$loco - loco_auc))
 
@@ -508,19 +519,25 @@ print_table <- function(res, label) {
               res$loco_ci[1], res$loco_ci[3],
               "---", "ref"))
 
-  cat(sprintf("%-30s  %8.3f  %18s  %8.3f  %+10.3f\n",
+  cat(sprintf("%-30s  %8.3f  [%5.3f, %5.3f]  %8.3f  %+10.3f  [%+.3f, %+.3f]\n",
               "Summary 10f (means+slopes)", res$summ_slopes$kfold_mean,
-              "", res$summ_slopes$kfold_sd,
-              res$summ_slopes$kfold_mean - res$loco))
+              res$summ_slopes$kfold_pi[1], res$summ_slopes$kfold_pi[2],
+              res$summ_slopes$kfold_sd,
+              res$summ_slopes$kfold_mean - res$loco,
+              res$summ_slopes$kfold_pi[1] - res$loco,
+              res$summ_slopes$kfold_pi[2] - res$loco))
   cat(sprintf("%-30s  %8.3f  [%5.3f, %5.3f]  %8s  %+10.3f\n",
               "Summary LOCO (means+slopes)", res$summ_slopes$loco,
               res$summ_slopes$loco_ci[1], res$summ_slopes$loco_ci[3],
               "---", res$summ_slopes$loco - res$loco))
 
-  cat(sprintf("%-30s  %8.3f  %18s  %8.3f  %+10.3f\n",
+  cat(sprintf("%-30s  %8.3f  [%5.3f, %5.3f]  %8.3f  %+10.3f  [%+.3f, %+.3f]\n",
               "Summary 10f (means only)", res$summ_means$kfold_mean,
-              "", res$summ_means$kfold_sd,
-              res$summ_means$kfold_mean - res$loco))
+              res$summ_means$kfold_pi[1], res$summ_means$kfold_pi[2],
+              res$summ_means$kfold_sd,
+              res$summ_means$kfold_mean - res$loco,
+              res$summ_means$kfold_pi[1] - res$loco,
+              res$summ_means$kfold_pi[2] - res$loco))
   cat(sprintf("%-30s  %8.3f  [%5.3f, %5.3f]  %8s  %+10.3f\n",
               "Summary LOCO (means only)", res$summ_means$loco,
               res$summ_means$loco_ci[1], res$summ_means$loco_ci[3],
