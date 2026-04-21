@@ -137,8 +137,8 @@ fig1 <- ggplot() +
   facet_grid(ER_label ~ AR1_label) +
   # Labels
   labs(x = "Number of clusters (N)",
-       y = "Mean optimism or deviation (AUROC units)",
-       caption = "Solid lines: naive 10-fold CV optimism (with 95% Monte Carlo CI bands) by ICC level.\nDashed grey lines: subject-level 10-fold CV deviation from LOCO (near zero across all conditions).") +
+       y = "Mean optimism (AUROC units)",
+       caption = "Solid lines: naive 10-fold CV optimism (with 95% Monte Carlo CI bands) by ICC level.\nDashed grey lines: subject-level 10-fold CV deviation from LOCO by ICC level (lines overlap near zero across all conditions,\nindicating ICC independence of subject-level CV deviation).") +
   # Theme
   theme_bw(base_size = 11) +
   theme(
@@ -153,7 +153,12 @@ fig1 <- ggplot() +
 
 ggsave(file.path(OUT_DIR, "Figure1_dot_line_optimism.pdf"),
        fig1, width = 9, height = 8, units = "in")
-cat("Saved Figure 1 to:", file.path(OUT_DIR, "Figure1_dot_line_optimism.pdf"), "\n")
+cat("Saved Figure 1 (PDF) to:", file.path(OUT_DIR, "Figure1_dot_line_optimism.pdf"), "\n")
+
+# High-resolution PNG for sharing/submission (avoids screen-capture tools)
+ggsave(file.path(OUT_DIR, "Figure1_dot_line_optimism.png"),
+       fig1, width = 9, height = 8, units = "in", dpi = 300)
+cat("Saved Figure 1 (PNG) to:", file.path(OUT_DIR, "Figure1_dot_line_optimism.png"), "\n")
 
 # ── 3. SUPPLEMENTARY FIGURE: HEAT MAP ───────────────────────────────────────
 # 6 x 3 grid (N x ICC) with color = mean optimism, paneled by AR1 x event rate.
@@ -193,7 +198,12 @@ fig_hm <- ggplot(hm_df, aes(x = ICC_num, y = N_f, fill = mean_opt)) +
 
 ggsave(file.path(OUT_DIR, "SuppFigure_heatmap_optimism.pdf"),
        fig_hm, width = 9, height = 8.5, units = "in")
-cat("Saved Supplementary Figure to:", file.path(OUT_DIR, "SuppFigure_heatmap_optimism.pdf"), "\n")
+cat("Saved Supplementary Figure (PDF) to:", file.path(OUT_DIR, "SuppFigure_heatmap_optimism.pdf"), "\n")
+
+# High-resolution PNG for sharing/submission
+ggsave(file.path(OUT_DIR, "SuppFigure_heatmap_optimism.png"),
+       fig_hm, width = 9, height = 8.5, units = "in", dpi = 300)
+cat("Saved Supplementary Figure (PNG) to:", file.path(OUT_DIR, "SuppFigure_heatmap_optimism.png"), "\n")
 
 # ── 4. UPDATED MANUSCRIPT SUMMARY STATISTICS ─────────────────────────────────
 # Print all values needed to update Sections 3.5–3.8 in the manuscript.
