@@ -207,7 +207,7 @@ naive_kfold <- function(X, y_obs, case_ids, k = 10, seed = 0) {
   }
 
   valid <- !is.na(preds)
-  subject_auroc(case_ids[valid], preds[valid], y_obs)
+  subject_auroc(case_ids[valid], preds[valid], y_obs[valid])
 }
 
 cluster_kfold <- function(X, y_obs, case_ids, k = 10, seed = 0) {
@@ -231,7 +231,7 @@ cluster_kfold <- function(X, y_obs, case_ids, k = 10, seed = 0) {
   }
 
   valid <- !is.na(preds)
-  subject_auroc(case_ids[valid], preds[valid], y_obs)
+  subject_auroc(case_ids[valid], preds[valid], y_obs[valid])
 }
 
 loco_cv <- function(X, y_obs, case_ids) {
@@ -449,7 +449,7 @@ for (outcome_var in c("severe_rop", "any_rop")) {
   for (j in seq_along(lambda_grid)) {
     lam <- lambda_grid[j]
 
-    naive_aucs_lam <- sapply(1:10, function(r) {
+    naive_aucs_lam <- sapply(1:N_CV_REPS, function(r) {
       set.seed(r)
       n <- nrow(X)
       fold_ids <- sample(rep(1:10, length.out = n))
@@ -463,7 +463,7 @@ for (outcome_var in c("severe_rop", "any_rop")) {
           X[test_idx, , drop = FALSE], lambda = lam)
       }
       valid <- !is.na(preds)
-      subject_auroc(case_ids[valid], preds[valid], y)
+      subject_auroc(case_ids[valid], preds[valid], y[valid])
     })
 
     # LOCO with this lambda
