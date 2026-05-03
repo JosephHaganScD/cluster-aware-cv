@@ -6,7 +6,7 @@ This repository contains R code supporting the manuscript:
 
 ## Overview
 
-This project investigates the performance of cross-validation (CV) strategies for prediction models when predictors are measured repeatedly over time but the binary outcome is defined at the subject level. In this setting, standard observation-level CV can introduce data leakage and lead to optimistic estimates of model performance.
+This project investigates the performance of cross-validation (CV) strategies for prediction models when predictors are measured repeatedly over time but the binary outcome is defined at the subject level. In this setting, standard observation-level CV can introduce data leakage and lead to optimistic estimates of model performance. The motivating example ROP clinical dataset from Srivatsa et al., 2022 is not publicly available, but the simulation pipeline can be run independently without it.
 
 ## Repository Structure
 
