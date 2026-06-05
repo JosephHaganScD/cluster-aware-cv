@@ -2,8 +2,7 @@
 
 This repository contains R code supporting the manuscript:
 
-> "Quantifying the Optimism of Naive Cross-Validation for Binary Outcome Prediction with Clustered Repeated-Measures Predictors: A Simulation Study and Clinical Illustration" BMC MRM, under review.
-> Joseph Hagan, ScD MSPH (ORCID: 0000-0002-3285-2131)
+"Quantifying the Optimism of Naive Cross-Validation for Binary Outcome Prediction with Repeated-Measures Predictors: A Simulation Study and Clinical Illustration." Joseph Hagan, ScD MSPH (ORCID: 0000-0002-3285-2131). medRxiv. 2026. https://doi.org/10.64898/2026.05.27.26354222. Manuscript under review at BMC Medical Research Methodology.
 
 ## Overview
 
